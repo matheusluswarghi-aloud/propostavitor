@@ -243,6 +243,26 @@
     text-transform:uppercase;color:var(--muted);
     display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
   }
+
+  /* ── investimento ─────────────────────────────────── */
+  .price{
+    margin:28px 0 6px;background:var(--surface);
+    border:1px solid var(--line-strong);border-top:3px solid var(--accent);
+    padding:26px 30px;display:grid;grid-template-columns:auto minmax(0,1fr);
+    gap:36px;align-items:center;
+  }
+  .price .fig{
+    font-family:var(--mono);font-size:2.4rem;font-weight:700;color:var(--accent);
+    line-height:1;letter-spacing:-.03em;white-space:nowrap;font-variant-numeric:tabular-nums;
+  }
+  .price .fig small{display:block;margin-top:8px;font-size:.62rem;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .price .lbl{
+    display:block;font-family:var(--mono);font-size:.59rem;font-weight:500;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:11px;
+  }
+  .price p{font-size:.96rem;color:var(--ink-2)}
+  .price b{color:var(--ink);font-weight:600}
+  @media (max-width:640px){.price{grid-template-columns:1fr;gap:20px;padding:22px 20px}}
 </style>
 </head>
 <body>
@@ -508,6 +528,18 @@
       e as decisões de oferta tomadas com dado — do jeito que a Ficha de matrícula já começou a
       fazer.
     </p>
+  </div>
+
+  <div class="price">
+    <p class="fig">R$&thinsp;6.000<small>fixo por mês</small></p>
+    <div>
+      <span class="lbl">Investimento · três primeiros meses</span>
+      <p>
+        Contrato <b>PJ de três meses</b>, com o escopo da seção 04: onboarding, recuperação,
+        dashboard, upsell, aulão e webinário semanal, a estrutura do lançamento pago e a leva mensal
+        de criativos.
+      </p>
+    </div>
   </div>
 </section>
 
