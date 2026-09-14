@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>O que ainda dá para construir — ECG Descomplicado</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --paper:#EEEFF1;
+    --surface:#FFFFFF;
+    --ink:#13161B;
+    --ink-2:#3C434D;
+    --muted:#767D88;
+    --line:#DBDDE1;
+    --line-strong:#BCC0C7;
+    --accent:#A62B26;
+    --accent-soft:#F5E8E7;
+    --ok:#0E6E66;
+    --sans:"Instrument Sans","Helvetica Neue",Arial,sans-serif;
+    --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0D0F13;
+      --surface:#161A20;
+      --ink:#ECEEF1;
+      --ink-2:#B4BAC3;
+      --muted:#7F8794;
+      --line:#242932;
+      --line-strong:#39414D;
+      --accent:#EE6A60;
+      --accent-soft:#241819;
+      --ok:#4FB3A6;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0D0F13;
+    --surface:#161A20;
+    --ink:#ECEEF1;
+    --ink-2:#B4BAC3;
+    --muted:#7F8794;
+    --line:#242932;
+    --line-strong:#39414D;
+    --accent:#EE6A60;
+    --accent-soft:#241819;
+    --ok:#4FB3A6;
+  }
+
+  *,*::before,*::after{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--sans);
+    font-size:17px;
+    line-height:1.58;
+    -webkit-font-smoothing:antialiased;
+  }
+  p{margin:0}
+  ul,ol{margin:0;padding:0;list-style:none}
+  h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
+  a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+  a:hover{border-bottom-color:var(--accent)}
+
+  .wrap{max-width:860px;margin:0 auto;padding:0 32px}
+  @media (max-width:520px){.wrap{padding:0 18px}}
+  .kicker{
+    font-family:var(--mono);font-size:.68rem;font-weight:500;
+    letter-spacing:.18em;text-transform:uppercase;color:var(--muted);
+  }
+
+  /* ── abas de navegação ────────────────────────────── */
+  .tabs{
+    position:sticky;top:0;z-index:50;
+    background:color-mix(in srgb,var(--paper) 86%,transparent);
+    backdrop-filter:saturate(180%) blur(14px);
+    -webkit-backdrop-filter:saturate(180%) blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  .tabs ul{display:flex;overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none}
+  .tabs ul::-webkit-scrollbar{display:none}
+  .tabs a{
+    display:block;padding:15px 0 13px;margin-right:28px;
+    font-family:var(--mono);font-size:.66rem;font-weight:500;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+    border-bottom:2px solid transparent;white-space:nowrap;
+    transition:color .18s ease,border-color .18s ease;
+  }
+  .tabs a:hover{color:var(--ink);border-bottom-color:var(--line-strong)}
+  .tabs a[aria-current="page"]{color:var(--accent);border-bottom-color:var(--accent)}
+  .tabs li:last-child a{margin-right:0}
+
+  /* ── topo ─────────────────────────────────────────── */
+  header{padding:52px 0 8px}
+  .rule-top{height:3px;background:var(--accent);width:52px;margin-bottom:26px}
+  h1{
+    font-size:clamp(2.15rem,5.4vw,3.15rem);line-height:1.03;
+    letter-spacing:-.028em;font-weight:700;margin:12px 0 18px;
+  }
+  .sub{color:var(--ink-2);max-width:58ch;font-size:1.04rem}
+  .sub b{color:var(--ink);font-weight:600}
+  .meta{
+    margin-top:26px;padding-top:16px;border-top:1px solid var(--line-strong);
+    display:flex;gap:26px;flex-wrap:wrap;
+    font-family:var(--mono);font-size:.63rem;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--muted);
+  }
+
+  /* ── tese ─────────────────────────────────────────── */
+  .thesis{
+    margin:44px 0 8px;background:var(--surface);
+    border:1px solid var(--line-strong);border-left:3px solid var(--accent);
+    padding:28px 30px;
+  }
+  .thesis p{font-size:1.12rem;color:var(--ink);line-height:1.5;letter-spacing:-.011em}
+  .thesis p + p{margin-top:14px;font-size:1rem;color:var(--ink-2)}
+  .thesis b{font-weight:600;color:var(--ink)}
+  @media (max-width:520px){.thesis{padding:22px 20px}}
+
+  /* ── faixa de números ─────────────────────────────── */
+  .stats{
+    display:grid;grid-template-columns:repeat(4,1fr);
+    border:1px solid var(--line-strong);background:var(--surface);margin:34px 0 6px;
+  }
+  .stats li{border-left:1px solid var(--line);padding:16px 14px 17px;min-width:0}
+  .stats li:first-child{border-left:0}
+  .stats .n{
+    display:block;font-family:var(--mono);font-size:1.22rem;font-weight:700;
+    color:var(--accent);line-height:1.15;font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+  }
+  .stats .t{
+    display:block;font-family:var(--mono);font-size:.58rem;font-weight:500;
+    letter-spacing:.09em;text-transform:uppercase;color:var(--muted);margin-top:7px;line-height:1.45;
+  }
+  @media (max-width:640px){
+    .stats{grid-template-columns:repeat(2,1fr)}
+    .stats li:nth-child(3){border-left:0}
+    .stats li:nth-child(n+3){border-top:1px solid var(--line)}
+  }
+
+  /* ── seções ───────────────────────────────────────── */
+  section{padding:44px 0 6px;border-top:1px solid var(--line);margin-top:44px}
+  .shead{display:flex;align-items:baseline;gap:14px;margin-bottom:20px}
+  .shead .num{
+    font-family:var(--mono);font-size:.68rem;font-weight:700;
+    letter-spacing:.15em;color:var(--accent);flex:none;
+  }
+  h2{font-size:1.42rem;letter-spacing:-.021em;line-height:1.18;font-weight:600}
+  section > p{color:var(--ink-2);max-width:66ch}
+  section > p + p{margin-top:16px}
+  section b{color:var(--ink);font-weight:600}
+
+  .list{margin-top:16px;max-width:66ch}
+  .list li{padding:11px 0 11px 20px;position:relative;color:var(--ink-2);border-top:1px solid var(--line)}
+  .list li:first-child{border-top:0;padding-top:2px}
+  .list li::before{content:"";position:absolute;left:2px;top:22px;width:5px;height:5px;background:var(--accent)}
+  .list li:first-child::before{top:13px}
+  .list b{color:var(--ink)}
+
+  .checks{margin:22px 0;display:grid;gap:1px;background:var(--line);border:1px solid var(--line-strong)}
+  .checks li{background:var(--surface);padding:14px 18px 14px 44px;position:relative;font-size:.94rem;color:var(--ink-2)}
+  .checks li::before{
+    content:"";position:absolute;left:18px;top:19px;width:12px;height:7px;
+    border-left:2px solid var(--ok);border-bottom:2px solid var(--ok);transform:rotate(-45deg);
+  }
+  .checks b{color:var(--ink);font-weight:600}
+
+  /* ── cartão de lacuna ─────────────────────────────── */
+  .gap{margin:26px 0 0;background:var(--surface);border:1px solid var(--line-strong)}
+  .gap + .gap{margin-top:18px}
+  .gap-head{
+    display:flex;align-items:baseline;gap:14px;
+    padding:18px 22px 16px;border-bottom:1px solid var(--line);
+  }
+  .gap-head .id{font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.12em;color:var(--accent);flex:none}
+  .gap-head h3{font-size:1.08rem;letter-spacing:-.012em;line-height:1.3}
+  .gap-row{
+    display:grid;grid-template-columns:132px minmax(0,1fr);gap:18px;
+    padding:14px 22px;border-top:1px solid var(--line);
+  }
+  .gap-head + .gap-row{border-top:0}
+  .gap-row .lbl{
+    font-family:var(--mono);font-size:.58rem;font-weight:700;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--muted);padding-top:4px;
+  }
+  .gap-row.today .lbl{color:var(--muted)}
+  .gap-row.build .lbl{color:var(--accent)}
+  .gap-row p,.gap-row li{font-size:.94rem;color:var(--ink-2)}
+  .gap-row p + p,.gap-row p + ul,.gap-row ul + p{margin-top:9px}
+  .gap-row .gap-row-note,.gap-row p.bars-note{font-size:.62rem;color:var(--muted)}
+  .gap-row ul:not(.flow):not(.bars) li{padding:3px 0 3px 15px;position:relative}
+  .gap-row ul:not(.flow):not(.bars) li::before{content:"";position:absolute;left:1px;top:13px;width:4px;height:4px;background:var(--accent)}
+  .gap-row b{color:var(--ink);font-weight:600}
+  @media (max-width:560px){
+    .gap-row{grid-template-columns:1fr;gap:6px;padding:13px 18px}
+    .gap-head{padding:16px 18px 14px}
+  }
+
+  /* ── fluxo ────────────────────────────────────────── */
+  .flow{
+    margin:6px 0 2px;display:grid;grid-template-columns:repeat(4,1fr);
+    gap:1px;background:var(--line);border:1px solid var(--line);
+  }
+  .flow li{background:var(--paper);padding:12px 12px 11px}
+  .flow .n{display:block;font-family:var(--mono);font-size:1.02rem;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .flow .d{display:block;margin-top:3px;font-family:var(--mono);font-size:.55rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);line-height:1.4}
+  .flow li.hot{background:var(--accent-soft)}
+  .flow li.hot .n{color:var(--accent)}
+  @media (max-width:560px){.flow{grid-template-columns:repeat(2,1fr)}}
+
+  /* ── barras ───────────────────────────────────────── */
+  .bars{margin:8px 0 2px;display:grid;gap:8px}
+  .bars li{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr) 42px;gap:12px;align-items:center}
+  .bars .k{font-size:.84rem;color:var(--ink-2);line-height:1.25}
+  .bars .track{height:8px;background:var(--line)}
+  .bars .fill{height:100%;background:var(--line-strong)}
+  .bars li.top .fill{background:var(--accent)}
+  .bars li.top .k{color:var(--ink);font-weight:600}
+  .bars .v{font-family:var(--mono);font-size:.74rem;font-weight:700;color:var(--ink);text-align:right;font-variant-numeric:tabular-nums}
+  .bars-note{margin-top:10px;font-family:var(--mono);font-size:.56rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);line-height:1.5}
+  @media (max-width:560px){.bars li{grid-template-columns:minmax(0,1fr) 42px}.bars .track{grid-column:1 / -1;grid-row:2}}
+
+  /* ── etapas ───────────────────────────────────────── */
+  .steps{margin:22px 0;display:grid;gap:1px;background:var(--line);border:1px solid var(--line-strong)}
+  .steps li{background:var(--surface);padding:17px 20px;display:grid;grid-template-columns:92px minmax(0,1fr);gap:18px}
+  .steps .t{font-family:var(--mono);font-size:.62rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--accent);padding-top:4px;white-space:nowrap}
+  .steps h3{margin:0 0 6px;font-size:.98rem}
+  .steps p{font-size:.9rem;color:var(--ink-2)}
+  @media (max-width:560px){.steps li{grid-template-columns:1fr;gap:6px}}
+
+  .note{margin:24px 0;padding:18px 22px;border:1px dashed var(--line-strong);background:var(--surface)}
+  .note .lbl{font-family:var(--mono);font-size:.6rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:8px}
+  .note p{font-size:.94rem;color:var(--ink-2)}
+
+  footer{
+    margin-top:56px;padding:26px 0 70px;border-top:1px solid var(--line-strong);
+    font-family:var(--mono);font-size:.63rem;letter-spacing:.09em;
+    text-transform:uppercase;color:var(--muted);
+    display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  }
+</style>
+</head>
+<body>
+
+<!-- ─────────────────────────────────────────────────────────────
+     ABAS · para adicionar uma página nova ao projeto, basta somar
+     um <li> abaixo. A aba da página em que se está leva
+     aria-current="page" — é o que a pinta de vermelho.
+     ───────────────────────────────────────────────────────────── -->
+<nav class="tabs">
+  <div class="wrap">
+    <ul>
+      <li><a href="https://luswarghi.com/cronogramavitor/">Cronograma de entregas</a></li>
+      <li><a href="https://luswarghi.com/ecgcoutinho/">Pesquisa de mercado</a></li>
+      <li><a href="https://luswarghi.com/plantaovitor/">Plantão Descomplicado</a></li>
+      <li><a href="https://luswarghi.com/propostavitor/" aria-current="page">Próximos passos</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<header>
+  <div class="rule-top"></div>
+  <p class="kicker">Além da VSL · ECG Descomplicado</p>
+  <h1>O que ainda dá para construir</h1>
+  <div class="meta">
+    <span>Setembro de 2026</span>
+    <span>Matheus Luswarghi</span>
+    <span>Para Dr. Vitor e Caitto</span>
+  </div>
+</header>
+
+<div class="thesis">
+  <p>
+    Hoje o ECG Descomplicado tem <b>uma porta de entrada muito boa e ainda nada depois dela</b>.
+    O aluno chega pela VSL e compra. O que vem em seguida — recebê-lo, oferecer o próximo passo,
+    chamar de volta quem quase comprou — é o que falta construir.
+  </p>
+  <p>
+    As peças que faltam não são grandes isoladamente. O que muda o negócio é montá-las na ordem
+    certa, uma alimentando a outra.
+  </p>
+</div>
+
+
+<!-- 01 ─────────────────────────────────────────────── -->
+<section>
+  <div class="shead"><span class="num">01</span><h2>O que já está bem feito</h2></div>
+
+  <p>
+    Antes das lacunas, o que eu encontrei funcionando — e que muito infoproduto desse porte não tem.
+  </p>
+
+  <ul class="list">
+    <li><b>Rastreamento de nível alto.</b> Pixel com API de Conversões, compra chegando pelo servidor em tempo real, eventos do VTurb mostrando até onde cada pessoa assiste e quem chega no pitch, UTMs chegando no vídeo. Não há nada para consertar aqui.</li>
+    <li><b>Audiência própria grande.</b> 66,8 mil seguidores no Instagram e 23,2 mil no TikTok, com vídeos recentes passando de 4 mil visualizações.</li>
+    <li><b>Posicionamento claro.</b> A bio já diz “Aprenda emergências cardiológicas e ECG sem enrolação”. O próximo produto já está anunciado — só ainda não existe.</li>
+    <li><b>Um funil que vende todo dia.</b> Na última semana, cerca de 1.850 pessoas deram play na VSL, 235 chegaram no pitch e cerca de 33 compraram.</li>
+  </ul>
+</section>
+
+<!-- 02 ─────────────────────────────────────────────── -->
+<section>
+  <div class="shead"><span class="num">02</span><h2>O que a gente já construiu junto</h2></div>
+
+  <ul class="checks">
+    <li><b>Ficha de matrícula no ar</b>, com 39 respostas. Hoje a gente sabe quem compra: médico formado, de UPA ou pronto-socorro, que recebe eletro todo plantão e tem medo de deixar passar algo grave.</li>
+    <li><b>VSL nova</b>, com mecanismo nomeado — o plano-sequência.</li>
+    <li><b>Leva de 15 criativos</b>, com testes de CTA e de gancho já planejados.</li>
+    <li><b>Rascunho do Plantão Descomplicado</b>, a aula ao vivo para quem já é aluno.</li>
+  </ul>
+</section>
+
+<!-- 03 ─────────────────────────────────────────────── -->
+<section>
+  <div class="shead"><span class="num">03</span><h2>As lacunas</h2></div>
+
+  <p>
+    Sete pontos. Em cada um: como está hoje, o que eu montaria e por que importa.
+  </p>
+
+  <!-- 3.1 -->
+  <article class="gap">
+    <div class="gap-head"><span class="id">3.1</span><h3>Receber quem comprou</h3></div>
+    <div class="gap-row today"><span class="lbl">Hoje</span><p>O aluno compra e recebe o e-mail de acesso da Hotmart. Não existe contato ativo depois da compra.</p></div>
+    <div class="gap-row build"><span class="lbl">O que eu montaria</span>
+      <div>
+        <p>Um fluxo de onboarding pela API oficial do WhatsApp, disparado pela compra:</p>
+        <ul>
+          <li>Boas-vindas do Dr. Vitor, com o acesso e o primeiro passo no curso.</li>
+          <li>Convite para preencher a <b>Ficha de matrícula</b>.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="gap-row"><span class="lbl">Por que importa</span><p>A Ficha é o que tirou o projeto do escuro sobre quem compra. Hoje ela depende de o aluno achar o link. No onboarding, vira parte da chegada e a amostra cresce toda semana sozinha. É também o canal que depois leva o aluno ao webinário e à ascensão.</p></div>
+  </article>
+
+  <!-- 3.2 -->
+  <article class="gap">
+    <div class="gap-head"><span class="id">3.2</span><h3>Recuperar quem quase comprou</h3></div>
+    <div class="gap-row today"><span class="lbl">Hoje</span><p>Não existe fluxo de recuperação.</p></div>
+    <div class="gap-row"><span class="lbl">O tamanho</span>
+      <div>
+        <ul class="flow">
+          <li><span class="n">~1.850</span><span class="d">deram play</span></li>
+          <li><span class="n">235</span><span class="d">chegaram no pitch</span></li>
+          <li><span class="n">~57</span><span class="d">iniciaram checkout</span></li>
+          <li class="hot"><span class="n">~20</span><span class="d">saíram sem comprar</span></li>
+        </ul>
+        <p style="margin-top:9px">Última semana, pelo pixel. São cerca de <b>20 pessoas por semana</b> que chegaram a um passo da compra.</p>
+      </div>
+    </div>
+    <div class="gap-row build"><span class="lbl">O que eu montaria</span>
+      <div>
+        <p>Fluxos curtos pela API do WhatsApp, cada um com a mensagem certa para o motivo da saída:</p>
+        <ul>
+          <li>Pix gerado e não pago.</li>
+          <li>Cartão recusado.</li>
+          <li>Checkout abandonado.</li>
+        </ul>
+        <p>E um <b>webinário de recuperação</b>: em vez de mandar quem abandonou o checkout direto de volta para a compra, a mensagem convida essa pessoa para uma aula. No fim da aula, o ECG Descomplicado é oferecido de novo, numa condição exclusiva.</p>
+      </div>
+    </div>
+    <div class="gap-row"><span class="lbl">Por que importa</span><p>É a venda mais barata que existe. A pessoa já assistiu à VSL e quase decidiu. Para quem só esbarrou no pagamento, a mensagem resolve; para quem ainda tinha dúvida, a aula resolve.</p></div>
+  </article>
+
+  <!-- 3.3 -->
+  <article class="gap">
+    <div class="gap-head"><span class="id">3.3</span><h3>Aumentar o valor de cada compra</h3></div>
+    <div class="gap-row today"><span class="lbl">Hoje</span><p>Não existe upsell.</p></div>
+    <div class="gap-row build"><span class="lbl">O que eu montaria</span><p>Um upsell imediato, logo depois da compra: um curso curto de <b>Emergências Cardiológicas</b> — a conduta depois do eletro. O aluno acabou de comprar para aprender a ler o traçado; o upsell responde a pergunta seguinte: “e agora, o que eu faço com esse paciente?”.</p></div>
+    <div class="gap-row"><span class="lbl">Por que esse</span>
+      <div>
+        <p>É o tema mais pedido na Ficha de matrícula, e fica ainda mais forte entre os médicos de UPA e pronto-socorro:</p>
+        <ul class="bars" style="margin-top:12px">
+          <li class="top"><span class="k">Emergências cardiológicas</span><span class="track"><span class="fill" style="width:64%;display:block"></span></span><span class="v">64%</span></li>
+          <li><span class="k">Arritmias</span><span class="track"><span class="fill" style="width:56%;display:block"></span></span><span class="v">56%</span></li>
+          <li><span class="k">Drogas vasoativas</span><span class="track"><span class="fill" style="width:56%;display:block"></span></span><span class="v">56%</span></li>
+          <li><span class="k">PCR e ACLS</span><span class="track"><span class="fill" style="width:56%;display:block"></span></span><span class="v">56%</span></li>
+          <li><span class="k">Mentoria</span><span class="track"><span class="fill" style="width:21%;display:block"></span></span><span class="v">21%</span></li>
+        </ul>
+        <p class="bars-note">39 fichas · múltipla escolha · entre médicos de UPA/PS, emergências cardiológicas chega a 82%</p>
+        <p style="margin-top:12px">Está dentro da autoridade do Dr. Vitor, já está prometido na bio do Instagram e, mais tarde, pode virar módulo do produto de ascensão sem retrabalho.</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- 3.4 -->
+  <article class="gap">
+    <div class="gap-head"><span class="id">3.4</span><h3>Ascensão: para onde o aluno vai depois do ECG</h3></div>
+    <div class="gap-row today"><span class="lbl">Hoje</span><p>Quem termina o ECG Descomplicado não tem próximo passo.</p></div>
+    <div class="gap-row build"><span class="lbl">O que eu montaria</span>
+      <div>
+        <ul>
+          <li><b>O aulão Plantão Descomplicado</b>, ao vivo com os alunos, vendendo o <b>Clube do Plantonista</b>. A oferta completa do Clube a gente define junto, com os temas que vêm logo atrás na Ficha. Como mentoria é o último pedido, o formato não precisa depender do tempo individual do Dr. Vitor.</li>
+          <li><b>O webinário semanal gravado</b>: a primeira aula ao vivo, gravada, passa a rodar toda semana convertendo para o Clube. O onboarding convida o aluno, e cada semana abre um grupo novo.</li>
+          <li><b>O lançamento pago</b>, depois, como estratégia à parte da VSL, reaproveitando a mesma estrutura de aula, pitch e grupos.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="gap-row"><span class="lbl">Por que importa</span><p>É onde está o LTV. Formato, preço e oferta desse degrau são as decisões mais importantes do próximo ciclo — e precisam ser tomadas com teste: primeiro com os alunos, depois no tráfego frio.</p></div>
+  </article>
+
+  <!-- 3.5 -->
+  <article class="gap">
+    <div class="gap-head"><span class="id">3.5</span><h3>Um funil de atração de novos seguidores</h3></div>
+    <div class="gap-row today"><span class="lbl">Hoje</span><p>O perfil cresce, mas sem uma estratégia intencional por trás: não há um caminho desenhado para trazer o plantonista certo até o perfil.</p></div>
+    <div class="gap-row build"><span class="lbl">O que eu montaria</span><p>Um funil de aquisição de seguidores estruturado: conteúdo e anúncios pensados para atrair o médico de UPA e pronto-socorro, com temas escolhidos a partir da Ficha de matrícula e medição de quanto cada seguidor novo custa.</p></div>
+    <div class="gap-row"><span class="lbl">Por que importa</span><p>Seguidor certo é a matéria-prima de tudo que vem depois: o webinário, o Clube e o lançamento pago vendem melhor para quem já acompanha o Dr. Vitor.</p></div>
+  </article>
+
+  <!-- 3.6 -->
+  <article class="gap">
+    <div class="gap-head"><span class="id">3.6</span><h3>Um dashboard único do negócio</h3></div>
+    <div class="gap-row today"><span class="lbl">Hoje</span><p>Os dados existem e são bons, mas vivem separados em três plataformas: Gerenciador de Anúncios, VTurb e Utmify.</p></div>
+    <div class="gap-row build"><span class="lbl">O que eu montaria</span><p>Um dashboard completo, juntando as três fontes numa tela só: do anúncio à compra, passando por VSL, checkout, upsell, recuperação e Ficha de matrícula. Em cima dele, uma leitura semanal dos números.</p></div>
+    <div class="gap-row"><span class="lbl">Por que importa</span><p>Hoje, para responder “qual criativo trouxe o aluno que comprou o upsell”, é preciso cruzar três telas na mão. Com o dashboard, a decisão de onde mexer na semana sai de um lugar só.</p></div>
+  </article>
+
+  <!-- 3.7 -->
+  <article class="gap">
+    <div class="gap-head"><span class="id">3.7</span><h3>Produção contínua de criativos</h3></div>
+    <div class="gap-row today"><span class="lbl">Hoje</span><p>Os criativos são produzidos em levas pontuais. A leva de 15 que escrevemos resolve agora, mas não é uma rotina.</p></div>
+    <div class="gap-row build"><span class="lbl">O que eu montaria</span>
+      <div>
+        <ul>
+          <li>Leitura semanal do que performou, do anúncio até a compra.</li>
+          <li>Uma leva nova de roteiros todo mês, escrita a partir dessa leitura.</li>
+          <li>Testes planejados: o que muda de um criativo para o outro é decidido antes de gravar, para cada resultado ensinar alguma coisa.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="gap-row"><span class="lbl">Por que importa</span><p>A VSL escala pelo criativo. Anúncio cansa em semanas, e quando não há leva nova pronta, o custo por compra sobe antes de alguém perceber.</p></div>
+  </article>
+
+</section>
+
+<!-- 04 ─────────────────────────────────────────────── -->
+<section>
+  <div class="shead"><span class="num">04</span><h2>O escopo dos três primeiros meses</h2></div>
+
+  <p>
+    As peças dependem umas das outras, por isso a ordem importa mais do que a lista. Este é o escopo
+    do contrato inicial: <b>três meses, como PJ</b>.
+  </p>
+
+  <ol class="steps">
+    <li>
+      <span class="t">Mês 1</span>
+      <div>
+        <h3>A base, e o upsell começa a ser gravado</h3>
+        <p>Onboarding, recuperação e dashboard no ar — trazem receita e dado desde as primeiras semanas. Em paralelo, o Dr. Vitor valida a ideia de Emergências Cardiológicas e começa a gravar as aulas, e o aulão Plantão Descomplicado é estruturado.</p>
+      </div>
+    </li>
+    <li>
+      <span class="t">Mês 2</span>
+      <div>
+        <h3>Upsell no ar, depois o aulão com os alunos</h3>
+        <p>Com as aulas gravadas, o upsell entra logo depois da compra: cada venda da VSL passa a valer mais, sem aumentar o investimento em tráfego. Em seguida, o aulão Plantão Descomplicado acontece ao vivo e vende o Clube do Plantonista. Gravado, ele vira o webinário semanal que o onboarding alimenta.</p>
+      </div>
+    </li>
+    <li>
+      <span class="t">Mês 3</span>
+      <div>
+        <h3>O lançamento pago</h3>
+        <p>Promessa e narrativa do evento, oferta, quantos dias de evento e a fase de captação — desenhados com o que a aula ao vivo e o webinário ensinaram sobre o que essa base compra.</p>
+      </div>
+    </li>
+  </ol>
+
+  <div class="note">
+    <span class="lbl">Nos três meses</span>
+    <p>
+      Rodando o tempo todo, em paralelo às fases: a leitura semanal no dashboard e uma leva nova de
+      criativos por mês.
+    </p>
+  </div>
+
+  <div class="note">
+    <span class="lbl">O que depende do Dr. Vitor</span>
+    <p>
+      Validar o tema do upsell, gravar as aulas, escolher os casos do aulão e fechar com a gente a oferta do Clube. É o que define o
+      ritmo do mês 2 — o resto roda do nosso lado.
+    </p>
+  </div>
+</section>
+
+<!-- 05 ─────────────────────────────────────────────── -->
+<section>
+  <div class="shead"><span class="num">05</span><h2>Por que um estrategista fixo</h2></div>
+
+  <p>
+    Cada item isolado, o time consegue tocar. O que ninguém toca sozinho é a costura: o onboarding
+    que alimenta o webinário, que testa a oferta, que vai para o lançamento — enquanto a VSL
+    continua vendendo todo dia. São <b>dois motores rodando para o mesmo público</b>, e alguém
+    precisa decidir o que entra em cada um e em que momento.
+  </p>
+
+  <div class="thesis">
+    <p>
+      A proposta: eu entro fixo no time, num contrato PJ de três meses inicialmente, <b>dono dessa sequência</b>. Uma leitura semanal dos números
+      e as decisões de oferta tomadas com dado — do jeito que a Ficha de matrícula já começou a
+      fazer.
+    </p>
+  </div>
+</section>
+
+<footer>
+  <span>Próximos passos · Setembro 2026</span>
+  <span>Matheus Luswarghi</span>
+</footer>
+
+</div>
+</body>
+</html>
